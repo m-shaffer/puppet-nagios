@@ -6,6 +6,7 @@ class nagios::client (
   $nagios_host_name                 = getvar('::nagios_host_name'),
   $nagios_server                    = getvar('::nagios_server'),
   # nrpe
+  $nrpe_manage                      = $::nagios::params::nrpe_manage,
   $nrpe_package                     = $::nagios::params::nrpe_package,
   $nrpe_package_alias               = $::nagios::params::nrpe_package_alias,
   $nrpe_cfg_file                    = $::nagios::params::nrpe_cfg_file,
@@ -68,58 +69,59 @@ class nagios::client (
     default => $nagios_server,
   }
 
-  # Base package(s)
-  # The 'nrpe' name is either inside $nrpe_package or is $nrpe_package_alias
-  package { $nrpe_package:
-    ensure => 'installed',
-    alias  => $nrpe_package_alias,
-  }
+  if $nrpe_manage {
+    # Base package(s)
+    # The 'nrpe' name is either inside $nrpe_package or is $nrpe_package_alias
+    package { $nrpe_package:
+      ensure => 'installed',
+      alias  => $nrpe_package_alias,
+    }
 
-  # Most plugins use nrpe, so we install it everywhere
-  service { $nrpe_service:
-    ensure    => 'running',
-    enable    => true,
-    hasstatus => true,
-    subscribe => File[$nrpe_cfg_file],
-  }
-  file { $nrpe_cfg_file:
-    owner   => 'root',
-    group   => $nrpe_group,
-    mode    => '0640',
-    content => template('nagios/nrpe.cfg.erb'),
-    require => Package['nrpe']
-  }
-  # Included in the package, but we need to enable purging
-  file { $nrpe_cfg_dir:
-    ensure  => 'directory',
-    owner   => 'root',
-    group   => $nrpe_group,
-    mode    => '0750',
-    purge   => true,
-    recurse => true,
-    require => Package['nrpe'],
-  }
-  # Create resource for the check_* parent resource
-  file { $plugin_dir:
-    ensure  => 'directory',
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0775',
-    require => Package['nrpe'],
-  }
+    # Most plugins use nrpe, so we install it everywhere
+    service { $nrpe_service:
+      ensure    => 'running',
+      enable    => true,
+      hasstatus => true,
+      subscribe => File[$nrpe_cfg_file],
+    }
+    file { $nrpe_cfg_file:
+      owner   => 'root',
+      group   => $nrpe_group,
+      mode    => '0640',
+      content => template('nagios/nrpe.cfg.erb'),
+      require => Package['nrpe']
+    }
+    # Included in the package, but we need to enable purging
+    file { $nrpe_cfg_dir:
+      ensure  => 'directory',
+      owner   => 'root',
+      group   => $nrpe_group,
+      mode    => '0750',
+      purge   => true,
+      recurse => true,
+      require => Package['nrpe'],
+    }
+    # Create resource for the check_* parent resource
+    file { $plugin_dir:
+      ensure  => 'directory',
+      owner   => 'root',
+      group   => 'root',
+      mode    => '0775',
+      require => Package['nrpe'],
+    }
 
-  # Where to store configuration for our custom nagios_* facts
-  # These facts are mostly obsolete and pre-date hiera existence
-  file { '/etc/nagios/facter':
-    ensure  => 'directory',
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0755',
-    purge   => true,
-    recurse => true,
-    require => Package['nrpe'],
+    # Where to store configuration for our custom nagios_* facts
+    # These facts are mostly obsolete and pre-date hiera existence
+    file { '/etc/nagios/facter':
+      ensure  => 'directory',
+      owner   => 'root',
+      group   => 'root',
+      mode    => '0755',
+      purge   => true,
+      recurse => true,
+      require => Package['nrpe'],
+    }
   }
-
   # The initial fact, to be used to know if a node is a nagios client
   nagios::client::config { 'client': value => 'true' }
 

@@ -45,6 +45,7 @@ class nagios::params {
 
   case $::operatingsystem {
     'RedHat', 'Fedora', 'CentOS', 'Scientific', 'Amazon': {
+      $nrpe_manage        = true
       $nrpe_package       = [ 'nrpe', 'nagios-plugins' ]
       $nrpe_package_alias = undef
       $nrpe_service       = 'nrpe'
@@ -68,6 +69,7 @@ class nagios::params {
       }
     }
     'Gentoo': {
+      $nrpe_manage        = true
       $nrpe_package       = [ 'net-analyzer/nrpe' ]
       $nrpe_package_alias = 'nrpe'
       $nrpe_service       = 'nrpe'
@@ -87,6 +89,7 @@ class nagios::params {
       }
     }
     'Debian', 'Ubuntu': {
+      $nrpe_manage        = true
       $nrpe_package       = [ 'nagios-nrpe-server' ]
       $nrpe_package_alias = 'nrpe'
       $nrpe_service       = 'nagios-nrpe-server'
@@ -105,7 +108,11 @@ class nagios::params {
         tag    => $nagios_plugins_packages,
       }
     }
+    'windows': {
+      $nrpe_manage        = false
+    }
     default: {
+      $nrpe_manage        = true
       $nrpe_package       = [ 'nrpe', 'nagios-plugins' ]
       $nrpe_package_alias = undef
       $nrpe_service       = 'nrpe'
