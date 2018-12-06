@@ -120,9 +120,7 @@ class nagios::client (
       mode    => '0755',
       purge   => true,
       recurse => true,
-      if $nrpe_manage {
-        require => Package['nrpe'],
-      }
+      require => Package['nrpe'],
     }
   }
   # The initial fact, to be used to know if a node is a nagios client
