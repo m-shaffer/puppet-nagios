@@ -127,8 +127,6 @@ class nagios::client (
   else {
       file { $facter_path:
       ensure  => 'directory',
-      owner   => 'root',
-      group   => 'root',
       mode    => '0755',
       purge   => true,
       recurse => true,
