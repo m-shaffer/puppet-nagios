@@ -123,6 +123,17 @@ class nagios::client (
       require => Package['nrpe'],
     }
   }
+  #even if not managing nrpe, add the facter directory, just don't require nrpe
+  else {
+      file { $facter_path:
+      ensure  => 'directory',
+      owner   => 'root',
+      group   => 'root',
+      mode    => '0755',
+      purge   => true,
+      recurse => true,
+    }
+  }
   # The initial fact, to be used to know if a node is a nagios client
   nagios::client::config { 'client': value => 'true' }
 
