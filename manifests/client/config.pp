@@ -1,6 +1,6 @@
 # Create nagios specific configuration by using nagios_* facts
 define nagios::client::config ( $value ) {
-    file { "/etc/nagios/facter/${title}.conf":
+    file { "${nagios::client::facter_path}/${title}.conf":
         owner   => 'root',
         group   => 'root',
         mode    => '0644',
