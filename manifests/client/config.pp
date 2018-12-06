@@ -6,7 +6,7 @@ define nagios::client::config ( $value ) {
         mode    => '0644',
         # Cosmetic, a "cat" of the files will be readable with \n
         content => "${value}\n",
-        require => File['/etc/nagios/facter'],
+        require => File[$nagios::client::facter_path],
     }
 }
 

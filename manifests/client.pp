@@ -7,6 +7,7 @@ class nagios::client (
   $nagios_server                    = getvar('::nagios_server'),
   # nrpe
   $nrpe_manage                      = $::nagios::params::nrpe_manage,
+  $facter_path                      = $::nagios::params::facter_path,
   $nrpe_package                     = $::nagios::params::nrpe_package,
   $nrpe_package_alias               = $::nagios::params::nrpe_package_alias,
   $nrpe_cfg_file                    = $::nagios::params::nrpe_cfg_file,
@@ -112,14 +113,16 @@ class nagios::client (
 
     # Where to store configuration for our custom nagios_* facts
     # These facts are mostly obsolete and pre-date hiera existence
-    file { '/etc/nagios/facter':
+    file { $facter_path:
       ensure  => 'directory',
       owner   => 'root',
       group   => 'root',
       mode    => '0755',
       purge   => true,
       recurse => true,
-      require => Package['nrpe'],
+      if $nrpe_manage {
+        require => Package['nrpe'],
+      }
     }
   }
   # The initial fact, to be used to know if a node is a nagios client
