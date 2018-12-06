@@ -133,8 +133,9 @@ class nagios::client (
     }
   }
   # The initial fact, to be used to know if a node is a nagios client
-  nagios::client::config { 'client': value => 'true' }
-
+  if $nrpe_manage {
+    nagios::client::config { 'client': value => 'true' }
+  }
   # The main nagios_host entry
   nagios::host { $host_name:
     server              => $server,
