@@ -113,7 +113,7 @@ class nagios::params {
     }
     'windows': {
       $nrpe_manage        = false
-      $facter_path        = 'C:\ProgramData\nagios\facter'
+      $facter_path        = 'C:\ProgramData\nagios'
     }
     default: {
       $nrpe_manage        = true
